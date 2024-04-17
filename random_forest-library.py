@@ -1,91 +1,85 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV, cross_val_predict
 from imblearn.over_sampling import SMOTE
-from sklearn.feature_selection import SelectFromModel, RFE
-
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+import joblib
 # Baca file CSV
 data = pd.read_csv('databaseUkt2023_preprocessed2.csv')
 
+# Ambil sampel acak sebanyak 2000
+data = data.head(2000)
+
 # Pisahkan fitur dan label
-X = data.drop(columns=['ukt', 'no_test']).values
-y = data['ukt'].values
+X = data.drop(columns=['ukt', 'no_test'])
+y = data['ukt']
 
-# Handle Imbalanced Data dengan SMOTE
+# Identifikasi outlier pada data
+Q1 = X.quantile(0.1)
+Q3 = X.quantile(0.9)
+IQR = Q3 - Q1
+outliers = ((X < (Q1 - 1.5 * IQR)) | (X > (Q3 + 1.5 * IQR))).any(axis=1)
+
+# Hapus outlier dari dataset
+X_no_outliers = X[~outliers]
+y_no_outliers = y[~outliers]
+
+# Handle Imbalanced Data with SMOTE
 smote = SMOTE(random_state=42)
-X_resampled, y_resampled = smote.fit_resample(X, y)
+X_resampled, y_resampled = smote.fit_resample(X_no_outliers, y_no_outliers)
 
-# Split data menjadi data latih dan data uji
-X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
+# Inisialisasi LDA
+lda = LDA()
 
-# Definisikan hyperparameter yang ingin dioptimalkan
-param_grid = {
-    # 'n_estimators': [100, 200, 300],
-    # 'max_depth': [None, 10, 20, 30],
-    # 'min_samples_split': [2, 5, 10],
-    # 'min_samples_leaf': [1, 2, 4],
-    # 'max_features': ['auto', 'sqrt', 'log2']
-    'n_estimators': [200],
-    'max_depth': [20],
+# Melatih LDA dan transformasi data
+X_lda = lda.fit_transform(X_resampled, y_resampled)
+
+# Inisialisasi Random Forest Classifier
+model = RandomForestClassifier()
+
+# Tentukan hyperparameter yang akan dioptimalkan
+param_dist = {
+    'n_estimators': [350],  
+    'max_depth': [39],       
     'min_samples_split': [2],
     'min_samples_leaf': [1],
     'max_features': ['sqrt']
 }
+  
+# Inisialisasi Stratified K-Fold Cross-Validation
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-# Inisialisasi model Random Forest
-model = RandomForestClassifier()
+# Inisialisasi Randomized Search dengan model, distribusi parameter, dan evaluasi metrik
+random_search = RandomizedSearchCV(estimator=model, param_distributions=param_dist, scoring='accuracy', random_state=42)
 
-# Definisikan jumlah fitur yang ingin dipertahankan
-num_features_to_select = 7  # Atur jumlah fitur yang ingin dipertahankan
+# Latih model dengan Randomized Search untuk mencari kombinasi hyperparameter terbaik
+random_search.fit(X_lda, y_resampled)
 
-# Lakukan RFE pada model Random Forest yang belum dilatih
-rfe = RFE(estimator=model, n_features_to_select=num_features_to_select, step=1)
+# Print the best hyperparameters
+best_params = random_search.best_params_
+print("Best Hyperparameters:", best_params)
 
-# Lakukan fit RFE pada data latih
-rfe.fit(X_train, y_train)
+# Train the best model with the best hyperparameters
+best_model = RandomForestClassifier(**best_params)
 
-# Transformasikan data latih dan data uji dengan fitur yang dipilih oleh RFE
-X_train_rfe = rfe.transform(X_train)
-X_test_rfe = rfe.transform(X_test)
+# Perform cross-validation
+y_pred = cross_val_predict(best_model, X_lda, y_resampled, cv=skf)
 
-# Inisialisasi Grid Search dengan model, parameter grid, dan metrik evaluasi
-grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy')
+# Calculate accuracy
+accuracy = accuracy_score(y_resampled, y_pred)
+print("Accuracy with Cross-Validation:", accuracy)
 
-# Latih model dengan Grid Search untuk mencari kombinasi hyperparameter terbaik
-grid_search.fit(X_train_rfe, y_train)
+# Classification Report
+print("Classification Report:")
+print(classification_report(y_resampled, y_pred)) 
 
-# Menampilkan semua kombinasi hyperparameter yang diuji
-print("All Hyperparameter Combinations:")
-for params, mean_score in zip(grid_search.cv_results_['params'], grid_search.cv_results_['mean_test_score']):
-    print("Hyperparameters:", params)
-    print("Mean Score:", mean_score)
-    print()
+# Confusion Matrix
+conf_mat = confusion_matrix(y_resampled, y_pred)
+print("Confusion Matrix:")
+print(conf_mat)
 
-# Seleksi fitur dengan SelectFromModel
-selector = SelectFromModel(grid_search.best_estimator_)
-selector.fit(X_train_rfe, y_train)
-X_train_selected = selector.transform(X_train_rfe)
-X_test_selected = selector.transform(X_test_rfe)
 
-# Latih ulang model pada fitur yang dipilih
-grid_search.best_estimator_.fit(X_train_selected, y_train)
-
-# Prediksi nilai UKT untuk data uji dengan model terbaik pada fitur yang dipilih
-predictions_selected = grid_search.best_estimator_.predict(X_test_selected)
-
-# Hitung akurasi prediksi pada fitur yang dipilih
-accuracy_selected = accuracy_score(y_test, predictions_selected)
-print("Accuracy with Feature Selection:", accuracy_selected)
-
-X_df = pd.DataFrame(X, columns=data.drop(columns=['ukt', 'no_test']).columns)
-
-# Menampilkan Feature Importance
-importance = grid_search.best_estimator_.feature_importances_
-for i in range(len(importance)):
-    print("Feature", X_df.columns[i], ":", importance[i])
-
-# Menampilkan fitur yang dipilih oleh RFE
-print("Selected Features:")
-for feature in X_df.columns[rfe.support_]:
-    print(feature)
+# Save model to a .pkl file
+joblib.dump(best_model, 'best_model4.pkl')
+print("Model telah disimpan sebagai 'best_model.pkl'")

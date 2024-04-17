@@ -63,8 +63,8 @@ def map_to_pendapatan_class(total_penghasilan):
 # kolom pendapatan_class 
 data['pendapatan_class'] = data['pendapatan_class'].apply(map_to_pendapatan_class)
 data['total_pendapatan'] = data['total_pendapatan'].apply(map_to_pendapatan_class)
-# data['penghasilan_ibu'] = data['penghasilan_ibu'].map(map_to_pendapatan_class)
-# data['penghasilan_ayah'] = data['penghasilan_ayah'].map(map_to_pendapatan_class)
+data['penghasilan_ibu'] = data['penghasilan_ibu'].map(map_to_pendapatan_class)
+data['penghasilan_ayah'] = data['penghasilan_ayah'].map(map_to_pendapatan_class)
 
 mapping_pendapatan_perkapita = {
      '< 500000': 1,

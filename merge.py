@@ -33,9 +33,12 @@ file2 = pd.read_excel('merge ukt_verifikasi 2.xlsx')
 merged_df = pd.merge(file1, file2, on='no_test', how='inner')
 merged_df = merged_df.drop(merged_df[(merged_df['fak_nama'] == 'D3') | (merged_df['ukt'] == 0)].index)
 
-print(file1.dtypes)
-print(file2.dtypes)
+file3 = pd.read_excel('ukt_verifikasi.xlsx')
+file3_filtered = file3[(file3['koreksi_potensitambah_ukt'] != 0) | (file3['koreksi_potensitambah_ukt_catatan'].notnull())]
+merged_df = merged_df[~merged_df['no_test'].isin(file3_filtered['no_test'])]
+# print(file1.dtypes)
+# print(file2.dtypes)
 # Menyimpan hasil gabungan ke file CSV baru
-merged_df.to_csv('merged_file.csv', index=False)
+merged_df.to_csv('merged_file_tanpakoreksi.csv', index=False)
 
 print("File CSV berhasil digabungkan!")
