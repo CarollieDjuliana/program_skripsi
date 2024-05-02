@@ -67,20 +67,21 @@ def preprocessing_data(input_file):
 
     # Mapping pekerjaan ayah dan ibu
     mapping_pekerjaan = {
-       'Tidak Bekerja': 1,
+        'Sudah Meninggal': 0,
+        'Tidak Bekerja': 1,
+        'Buruh': 2,
         'Nelayan': 2,
         'Petani': 2,
         'Peternak': 2,
-        'PNS / TNI / Polri': 9,
-        'Karyawan Swasta': 6,
         'Pedagang Kecil': 3,
-        'Pedagang Besar': 8,
-        'Wiraswasta': 7,
-        'Wirausaha': 8,
-        'Buruh': 1,
-        'Pensiunan': 6,
-        'Sudah Meninggal': 0,
-        'Lainnya': 5
+        'Karyawan Swasta': 4,
+        'Lainnya': 5,
+        'Wiraswasta': 6,
+        'Wirausaha': 6,
+        'Pedagang Besar': 7,
+        'Pensiunan': 8,
+        'PNS / TNI / Polri': 9,
+        
     }
 
     data['pekerjaan_ayah'] = data['pekerjaan_ayah'].map(mapping_pekerjaan)
@@ -99,10 +100,10 @@ def preprocessing_data(input_file):
 
     return selected_data
 
-# Panggil fungsi preprocessing_data dengan input_file yang sesuai
-input_file = 'data_gabungan2.csv'
-data = preprocessing_data(input_file)
+# # Panggil fungsi preprocessing_data dengan input_file yang sesuai
+# input_file = 'data_gabungan2.csv'
+# data = preprocessing_data(input_file)
 
-# Simpan data ke dalam file CSV
-output_file = '_preprocessing.csv'
-data.to_csv(output_file, index=False)
+# # Simpan data ke dalam file CSV
+# output_file = '_preprocessing.csv'
+# data.to_csv(output_file, index=False)

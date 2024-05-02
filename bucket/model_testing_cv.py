@@ -5,7 +5,7 @@ from imblearn.over_sampling import ADASYN
 from sklearn.model_selection import train_test_split, cross_val_score
 
 # 1. Baca dan Persiapkan Data
-data = pd.read_csv('_merged_data.csv')
+data = pd.read_csv('bucket/_merged_data.csv')
 
 data = data.fillna(0)
 X = data.drop(columns=['ukt_rev', 'no_test']).values
