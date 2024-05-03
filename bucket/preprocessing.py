@@ -2,6 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+
 def preprocessing_data(input_file):
     # Baca data
     data = pd.read_csv(input_file, delimiter=',', encoding='latin-1')
@@ -11,17 +12,21 @@ def preprocessing_data(input_file):
     data = data[data['fak_nama'] == 'S1']
     data = data[data['koreksi_potensitambah_ukt'] == 0]
     data = data[data['koreksi_potensitambah_ukt_catatan'].isnull()]
-    data = data[(data['penghasilan_ayah'] != 0) | (data['penghasilan_ibu'] != 0)]
+    data = data[(data['penghasilan_ayah'] != 0) |
+                (data['penghasilan_ibu'] != 0)]
     data['keberadaan_orangtua'] = data['keberadaan_ayah'] + data['keberadaan_ibu']
-    data['pajak'] = data['koreksi_harta_pajak_mobil'] + data['koreksi_harta_pajak_motor']
-    data['total_pendapatan'] = data['koreksi_penghasilan_ayah'] + data['koreksi_penghasilan_ibu']
-    data['pendapatan_class'] = data['total_pendapatan'] / data['jumlah_tanggungan']
+    data['pajak'] = data['koreksi_harta_pajak_mobil'] + \
+        data['koreksi_harta_pajak_motor']
+    data['total_pendapatan'] = data['koreksi_penghasilan_ayah'] + \
+        data['koreksi_penghasilan_ibu']
+    data['pendapatan_class'] = data['total_pendapatan'] / \
+        data['jumlah_tanggungan']
 
     # Mapping fakultas
     def map_to_fakultas(jurusan):
         if jurusan in ["Pendidikan Dokter", "Pendidikan Dokter Gigi", "Psikologi", "Ilmu Keperawatan"]:
             return 1
-        elif jurusan in ["Agroekoteknologi","Agronomi", "Ilmu Tanah", "Agribisnis", "Teknik Pertanian", "Ilmu dan Teknologi Pangan", "Peternakan", "Budidaya Perairan (Akuakultur)", "Proteksi Tanaman", "Teknologi Hasil Perikanan", "Budidaya Perairan", "Teknologi Hasil Pertanian"]:
+        elif jurusan in ["Agroekoteknologi", "Agronomi", "Ilmu Tanah", "Agribisnis", "Teknik Pertanian", "Ilmu dan Teknologi Pangan", "Peternakan", "Budidaya Perairan (Akuakultur)", "Proteksi Tanaman", "Teknologi Hasil Perikanan", "Budidaya Perairan", "Teknologi Hasil Pertanian"]:
             return 2
         elif jurusan in ["Sistem Informasi", "Teknik Informatika", "Ilmu Komputer", "Sistem Komputer"]:
             return 3
@@ -63,7 +68,8 @@ def preprocessing_data(input_file):
         else:
             return 8
 
-    data['pendapatan_class'] = data['pendapatan_class'].apply(map_to_pendapatan_class)
+    data['pendapatan_class'] = data['pendapatan_class'].apply(
+        map_to_pendapatan_class)
 
     # Mapping pekerjaan ayah dan ibu
     mapping_pekerjaan = {
@@ -81,7 +87,7 @@ def preprocessing_data(input_file):
         'Pedagang Besar': 7,
         'Pensiunan': 8,
         'PNS / TNI / Polri': 9,
-        
+
     }
 
     data['pekerjaan_ayah'] = data['pekerjaan_ayah'].map(mapping_pekerjaan)

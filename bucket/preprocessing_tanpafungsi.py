@@ -8,21 +8,27 @@ data = data[data['ukt_rev'] != 0]
 data = data[data['fak_nama'] == 'S1']
 data = data[data['koreksi_potensitambah_ukt'] == 0]
 data = data[data['koreksi_potensitambah_ukt_catatan'].isnull()]
-data['x'] =( data['koreksi_pengeluaran_mhs_iuran_sekolah'] * data['sekolah'] )
+data['x'] = (data['koreksi_pengeluaran_mhs_iuran_sekolah'] * data['sekolah'])
 data = data[(data['penghasilan_ayah'] != 0) | (data['penghasilan_ibu'] != 0)]
 # Tambahkan kondisi untuk menghapus data dengan penghasilan ayah dan ibu yang sama dengan 0
-data['keberadaan_orangtua'] =( data['keberadaan_ayah'] + data['keberadaan_ibu'] )
-data['pajak'] =( data['koreksi_harta_pajak_mobil'] + data['koreksi_harta_pajak_motor'] )
+data['keberadaan_orangtua'] = (
+    data['keberadaan_ayah'] + data['keberadaan_ibu'])
+data['pajak'] = (data['koreksi_harta_pajak_mobil'] +
+                 data['koreksi_harta_pajak_motor'])
 
 # Kolom total_penghasilan'
-data['total_pendapatan'] =( data['koreksi_penghasilan_ayah'] + data['koreksi_penghasilan_ibu'] )
-data['pendapatan_class'] =( data['koreksi_penghasilan_ayah'] + data['koreksi_penghasilan_ibu'] )/data['jumlah_tanggungan']
+data['total_pendapatan'] = (
+    data['koreksi_penghasilan_ayah'] + data['koreksi_penghasilan_ibu'])
+data['pendapatan_class'] = (data['koreksi_penghasilan_ayah'] +
+                            data['koreksi_penghasilan_ibu'])/data['jumlah_tanggungan']
 
 # fakultas
+
+
 def map_to_fakultas(jurusan):
     if jurusan in ["Pendidikan Dokter", "Pendidikan Dokter Gigi", "Psikologi", "Ilmu Keperawatan"]:
         return 1
-    elif jurusan in ["Agroekoteknologi","Agronomi", "Ilmu Tanah", "Agribisnis", "Teknik Pertanian", "Ilmu dan Teknologi Pangan", "Peternakan", "Budidaya Perairan (Akuakultur)", "Proteksi Tanaman", "Teknologi Hasil Perikanan", "Budidaya Perairan", "Teknologi Hasil Pertanian"]:
+    elif jurusan in ["Agroekoteknologi", "Agronomi", "Ilmu Tanah", "Agribisnis", "Teknik Pertanian", "Ilmu dan Teknologi Pangan", "Peternakan", "Budidaya Perairan (Akuakultur)", "Proteksi Tanaman", "Teknologi Hasil Perikanan", "Budidaya Perairan", "Teknologi Hasil Pertanian"]:
         return 2
     elif jurusan in ["Sistem Informasi", "Teknik Informatika", "Ilmu Komputer", "Sistem Komputer"]:
         return 3
@@ -42,11 +48,14 @@ def map_to_fakultas(jurusan):
         return 10
     else:
         return 999
-    
+
+
 # membuat kolom fakultas
 data['fakultas'] = data['prodi_nama'].apply(map_to_fakultas)
 
 # fungsi pendapatan_class
+
+
 def map_to_pendapatan_class(total_penghasilan):
     if total_penghasilan < 500000:
         return 1
@@ -65,11 +74,13 @@ def map_to_pendapatan_class(total_penghasilan):
     else:
         return 8
 
-# kolom pendapatan_class 
-data['pendapatan_class'] = data['pendapatan_class'].apply(map_to_pendapatan_class)
+
+# kolom pendapatan_class
+data['pendapatan_class'] = data['pendapatan_class'].apply(
+    map_to_pendapatan_class)
 
 
-# pekerjaan ayah dan ibu 
+# pekerjaan ayah dan ibu
 mapping_pekerjaan = {
     'Tidak Bekerja': 1,
     'Nelayan': 2,
@@ -87,14 +98,14 @@ mapping_pekerjaan = {
     'Lainnya': 5
 }
 
-data['pekerjaan_ayah']=data['pekerjaan_ayah'].map(mapping_pekerjaan)
-data['pekerjaan_ibu']=data['pekerjaan_ibu'].map(mapping_pekerjaan)
+data['pekerjaan_ayah'] = data['pekerjaan_ayah'].map(mapping_pekerjaan)
+data['pekerjaan_ibu'] = data['pekerjaan_ibu'].map(mapping_pekerjaan)
 
 # NAN
 data = data.fillna(data.mode().iloc[0])
 
 # Daftar kolom yang diambil
-selected_columns = ['no_test','id','fakultas', 'pekerjaan_ayah','pekerjaan_ibu','pendapatan_class',
+selected_columns = ['no_test', 'id', 'fakultas', 'pekerjaan_ayah', 'pekerjaan_ibu', 'pendapatan_class',
                     'penghasilan_ayah', 'penghasilan_ibu',
                     'kepemilikan_rumah', 'koreksi_pengeluaran_mhs_iuran_sekolah',
                     'kendaraan', 'sekolah', 'listrik', 'keberadaan_orangtua', 'pajak', 'ukt_rev']
@@ -106,4 +117,3 @@ print(corr_matrix)
 sns.heatmap(corr_matrix)
 # Simpan data
 selected_data.to_csv('after_preprocessing.csv', index=False)
-

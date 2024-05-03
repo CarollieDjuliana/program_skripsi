@@ -1,0 +1,21 @@
+
+%%{init: {'theme':'forest'}}%%
+
+sequenceDiagram
+
+    Title Sequence diagram of .prediction() of /prediction.py
+
+    participant p1 as prediction()<br>:prediction.py/prediction.py
+    participant p2 as <br>:preparation.py/preparation.py
+    participant p3 as <br>:model.py/model.py
+
+
+	p1 ->>+ p2: 1: prepraration_data(data)
+	p2 -->>- p1: 1: return value
+	p1 ->>+ p3: 2: train_random_forest(X_train, y_train, n_estimators,<br>max_depth)
+	p3 ->>+ p3: 2.1: preprocessing(X)
+	p3 -->>- p3: 2.1: return value
+	p3 -->>- p1: 2: return value
+	p1 ->>+ p3: 3: preprocessing(X_test)
+	p3 -->>- p1: 3: return value
+        
