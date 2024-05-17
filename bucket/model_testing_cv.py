@@ -3,16 +3,19 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, f1_score
 from imblearn.over_sampling import ADASYN
 from sklearn.model_selection import train_test_split, cross_val_score
+from preprocessing import preprocessing_data
 
 # 1. Baca dan Persiapkan Data
-data = pd.read_csv('bucket/_merged_data.csv')
+data = 'hasil_filter.csv'
+data = preprocessing_data(data)
 
 data = data.fillna(0)
 X = data.drop(columns=['ukt_rev', 'no_test']).values
 y = data['ukt_rev'].values
 
 # 2. Bagi Data menjadi Data Latih dan Data Uji
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=34)
 
 # 3. Oversampling dengan ADASYN
 adasyn = ADASYN(random_state=42)
@@ -20,7 +23,7 @@ X_resampled, y_resampled = adasyn.fit_resample(X_train, y_train)
 
 # 4. Inisialisasi Model Random Forest tanpa pembobotan kelas
 param_dist = {
-    'n_estimators': 300,
+    'n_estimators': 40,
     'max_depth': None,
     'random_state': 42
 }

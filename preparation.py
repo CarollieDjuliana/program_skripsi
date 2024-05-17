@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 
 
 class preparation:
-    def prepraration_data(data):
+    def preparation_data(data):
         # Filter data
-        data = data[data['ukt_rev'] != 0]
-        data['keberadaan_orangtua'] = data['keberadaan_ayah'] + \
-            data['keberadaan_ibu']
-        data['pajak'] = data['koreksi_harta_pajak_mobil'] + \
-            data['koreksi_harta_pajak_motor']
-        data['rata-rata_pendapatan'] = (data['penghasilan_ayah'] +
-                                        data['penghasilan_ibu']) / data['jumlah_tanggungan']
+        # data = data[data['ukt_rev'] != 0]
+        data['keberadaan orangtua'] = data['keberadaan ayah'] + \
+            data['keberadaan ibu']
+        data['pajak'] = data['pajak mobil'] + \
+            data['pajak motor']
+        data['rata-rata pendapatan'] = (data['penghasilan ayah'] +
+                                        data['penghasilan ibu']) / data['jumlah tanggungan']
 
         # Mapping fakultas
         def map_to_fakultas(jurusan):
@@ -39,29 +39,29 @@ class preparation:
             else:
                 return 999
 
-        data['fakultas'] = data['prodi_nama'].apply(map_to_fakultas)
+        data['fakultas'] = data['prodi'].apply(map_to_fakultas)
 
         # Mapping pendapatan_class
-        def map_to_pendapatan_class(pendapata):
-            if pendapata < 500000:
+        def map_to_rata_pendapatan(pendapatan):
+            if pendapatan < 500000:
                 return 1
-            elif 500000 <= pendapata <= 650000:
+            elif 500000 <= pendapatan <= 650000:
                 return 2
-            elif 650001 <= pendapata <= 800000:
+            elif 650001 <= pendapatan <= 800000:
                 return 3
-            elif 800001 <= pendapata <= 950000:
+            elif 800001 <= pendapatan <= 950000:
                 return 4
-            elif 950001 <= pendapata <= 1100000:
+            elif 950001 <= pendapatan <= 1100000:
                 return 5
-            elif 1100001 <= pendapata <= 1250000:
+            elif 1100001 <= pendapatan <= 1250000:
                 return 6
-            elif 1250001 <= pendapata <= 1400000:
+            elif 1250001 <= pendapatan <= 1400000:
                 return 7
             else:
                 return 8
 
-        data['rata-rata_pendapatan'] = data['rata-rata_pendapatan'].apply(
-            map_to_pendapatan_class)
+        data['rata-rata pendapatan'] = data['rata-rata pendapatan'].apply(
+            map_to_rata_pendapatan)
 
         # Mapping pekerjaan ayah dan ibu
         mapping_pekerjaan = {
@@ -82,17 +82,17 @@ class preparation:
 
         }
 
-        data['pekerjaan_ayah'] = data['pekerjaan_ayah'].map(mapping_pekerjaan)
-        data['pekerjaan_ibu'] = data['pekerjaan_ibu'].map(mapping_pekerjaan)
+        data['pekerjaan ayah'] = data['pekerjaan ayah'].map(mapping_pekerjaan)
+        data['pekerjaan ibu'] = data['pekerjaan ibu'].map(mapping_pekerjaan)
 
         # Isi nilai NaN
         data = data.fillna(data.mode().iloc[0])
 
         # Pilih kolom yang diambil
-        selected_columns = ['no_test', 'id', 'fakultas', 'pekerjaan_ayah', 'pekerjaan_ibu', 'rata-rata_pendapatan',
-                            'penghasilan_ayah', 'penghasilan_ibu', 'kepemilikan_rumah',
-                            'koreksi_pengeluaran_mhs_iuran_sekolah', 'kendaraan', 'sekolah', 'listrik',
-                            'keberadaan_orangtua', 'pajak', 'ukt_rev']
+        selected_columns = ['id', 'fakultas', 'pekerjaan ayah', 'pekerjaan ibu', 'rata-rata pendapatan',
+                            'penghasilan ayah', 'penghasilan ibu', 'kepemilikan rumah',
+                            'iuran sekolah', 'kendaraan', 'listrik',
+                            'keberadaan orangtua', 'pajak', 'ukt']
 
         selected_data = data[selected_columns]
 

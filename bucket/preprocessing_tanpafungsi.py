@@ -2,25 +2,26 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-data = pd.read_csv('data_mentah.csv', delimiter=',', encoding='latin-1')
+data = pd.read_csv('data_verifikasi_ukt2023.csv',
+                   delimiter=',', encoding='latin-1')
 
-data = data[data['ukt_rev'] != 0]
-data = data[data['fak_nama'] == 'S1']
-data = data[data['koreksi_potensitambah_ukt'] == 0]
-data = data[data['koreksi_potensitambah_ukt_catatan'].isnull()]
-data['x'] = (data['koreksi_pengeluaran_mhs_iuran_sekolah'] * data['sekolah'])
+# data = data[data['ukt_rev'] != 0]
+# data = data[data['fak_nama'] == 'S1']
+# data = data[data['koreksi_potensitambah_ukt'] == 0]
+# data = data[data['koreksi_potensitambah_ukt_catatan'].isnull()]
+
 data = data[(data['penghasilan_ayah'] != 0) | (data['penghasilan_ibu'] != 0)]
 # Tambahkan kondisi untuk menghapus data dengan penghasilan ayah dan ibu yang sama dengan 0
 data['keberadaan_orangtua'] = (
     data['keberadaan_ayah'] + data['keberadaan_ibu'])
-data['pajak'] = (data['koreksi_harta_pajak_mobil'] +
-                 data['koreksi_harta_pajak_motor'])
+data['pajak'] = (data['pajak_mobil'] +
+                 data['pajak_motor'])
 
 # Kolom total_penghasilan'
 data['total_pendapatan'] = (
-    data['koreksi_penghasilan_ayah'] + data['koreksi_penghasilan_ibu'])
-data['pendapatan_class'] = (data['koreksi_penghasilan_ayah'] +
-                            data['koreksi_penghasilan_ibu'])/data['jumlah_tanggungan']
+    data['penghasilan_ayah'] + data['penghasilan_ibu'])
+data['pendapatan_class'] = (data['penghasilan_ayah'] +
+                            data['penghasilan_ibu'])/data['jumlah_tanggungan']
 
 # fakultas
 
@@ -105,10 +106,10 @@ data['pekerjaan_ibu'] = data['pekerjaan_ibu'].map(mapping_pekerjaan)
 data = data.fillna(data.mode().iloc[0])
 
 # Daftar kolom yang diambil
-selected_columns = ['no_test', 'id', 'fakultas', 'pekerjaan_ayah', 'pekerjaan_ibu', 'pendapatan_class',
-                    'penghasilan_ayah', 'penghasilan_ibu',
-                    'kepemilikan_rumah', 'koreksi_pengeluaran_mhs_iuran_sekolah',
-                    'kendaraan', 'sekolah', 'listrik', 'keberadaan_orangtua', 'pajak', 'ukt_rev']
+selected_columns = ['id', 'fakultas', 'pekerjaan_ayah', 'pekerjaan_ibu', 'pendapatan_class',
+                    'penghasilan_ayah', 'penghasilan_ibu', 'kepemilikan_rumah',
+                    'koreksi_pengeluaran_mhs_iuran_sekolah', 'kendaraan', 'listrik',
+                    'keberadaan_orangtua', 'pajak', 'ukt']
 
 selected_data = data[selected_columns]
 

@@ -1,12 +1,13 @@
-import pandas as pd
+import csv
+from sklearn.metrics import confusion_matrix
 import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
+import time
+from sklearn.metrics import accuracy_score
+from preprocessing import preprocessing_data
 
-
-class model:
-    def train_random_forest(X, y, n_estimators, max_depth):
-        rf_model = RandomForest(n_estimators, max_depth)
-        rf_model.fit(X, y)
-        return rf_model
+start_time = time.time()
 
 
 class DecisionTree:
@@ -104,5 +105,61 @@ class RandomForest:
         predictions = np.array([tree.predict(X) for tree in self.trees])
         return np.round(np.mean(predictions, axis=0))
 
+    def score(self, X, y):
+        predictions = self.predict(X)
+        return accuracy_score(y, predictions)
+
     def get_params(self, deep=True):
         return {'n_trees': self.n_trees, 'max_depth': self.max_depth, 'bootstrap_ratio': self.bootstrap_ratio, 'random_state': self.random_state}
+
+
+def print_class_counts(y):
+    unique_classes, class_counts = np.unique(y, return_counts=True)
+    class_counts_dict = dict(zip(unique_classes, class_counts))
+
+    for class_label, count in class_counts_dict.items():
+        print(f"Jumlah sampel pada kelas {class_label}: {count}")
+
+
+# Baca file CSV
+# data = 'bucket/data_gabungan2.csv'
+data = 'data_verifikasi_ukt2023.csv'
+data = preprocessing_data(data)
+# data.to_csv('testdata.csv', index=False)
+# data = pd.read_csv('data3_cleaned.csv')
+# data = pd.read_csv('data3_cleaned.csv')
+# data = data.head(1000,)
+X = data.drop(columns=['ukt'
+                       ]).values
+y = data['ukt'].values
+indices = data.index.values
+
+
+# Split data menjadi data latih dan data uji
+X_train, X_test, y_train, y_test, indices_train, indices_test = train_test_split(
+    X, y, indices, test_size=0.2, random_state=34)
+print_class_counts(y)
+
+# Inisialisasi model Random Forest dengan hyperparameter yang baru
+model = RandomForest(n_trees=35, max_depth=10)
+
+# Latih model dengan data latih
+model.fit(X_train, y_train)
+
+# Prediksi nilai UKT untuk data uji
+predictions = model.predict(X_test)
+
+# Hitung akurasi prediksi
+accuracy = accuracy_score(y_test, predictions)
+print("Accuracy: ", accuracy)
+
+
+# 1. Hitung confusion matrix
+cm = confusion_matrix(y_test, predictions)
+print("Confusion Matrix:")
+print(cm)
+
+correctly_classified_indices = indices_test[y_test == predictions]
+correctly_classified_data = data.loc[correctly_classified_indices]
+correctly_classified_data.to_csv('correctly_classified_data.csv', index=False)
+print("Correctly classified data saved to correctly_classified_data.csv")

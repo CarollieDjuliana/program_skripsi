@@ -8,17 +8,17 @@ def preprocessing_data(input_file):
     data = pd.read_csv(input_file, delimiter=',', encoding='latin-1')
 
     # Filter data
-    data = data[data['ukt_rev'] != 0]
-    data = data[data['fak_nama'] == 'S1']
-    data = data[data['koreksi_potensitambah_ukt'] == 0]
-    data = data[data['koreksi_potensitambah_ukt_catatan'].isnull()]
-    data = data[(data['penghasilan_ayah'] != 0) |
-                (data['penghasilan_ibu'] != 0)]
+    # data = data[data['ukt_rev'] != 0]
+    # data = data[data['fak_nama'] == 'S1']
+    # data = data[data['koreksi_potensitambah_ukt'] == 0]
+    # data = data[data['koreksi_potensitambah_ukt_catatan'].isnull()]
+    # data = data[(data['penghasilan_ayah'] != 0) |
+    #             (data['penghasilan_ibu'] != 0)]
     data['keberadaan_orangtua'] = data['keberadaan_ayah'] + data['keberadaan_ibu']
-    data['pajak'] = data['koreksi_harta_pajak_mobil'] + \
-        data['koreksi_harta_pajak_motor']
-    data['total_pendapatan'] = data['koreksi_penghasilan_ayah'] + \
-        data['koreksi_penghasilan_ibu']
+    data['pajak'] = data['pajak_mobil'] + \
+        data['pajak_motor']
+    data['total_pendapatan'] = data['penghasilan_ayah'] + \
+        data['penghasilan_ibu']
     data['pendapatan_class'] = data['total_pendapatan'] / \
         data['jumlah_tanggungan']
 
@@ -72,16 +72,33 @@ def preprocessing_data(input_file):
         map_to_pendapatan_class)
 
     # Mapping pekerjaan ayah dan ibu
+    # mapping_pekerjaan = {
+    #     'Sudah Meninggal': 0,
+    #     'Tidak Bekerja': 1,
+    #     'Buruh': 2,
+    #     'Nelayan': 2,
+    #     'Petani': 2,
+    #     'Peternak': 2,
+    #     'Pedagang Kecil': 3,
+    #     'Karyawan Swasta': 4,
+    #     'Lainnya': 5,
+    #     'Wiraswasta': 6,
+    #     'Wirausaha': 6,
+    #     'Pedagang Besar': 7,
+    #     'Pensiunan': 8,
+    #     'PNS / TNI / Polri': 9,
+
+    # }
     mapping_pekerjaan = {
         'Sudah Meninggal': 0,
         'Tidak Bekerja': 1,
         'Buruh': 2,
         'Nelayan': 2,
-        'Petani': 2,
-        'Peternak': 2,
-        'Pedagang Kecil': 3,
-        'Karyawan Swasta': 4,
-        'Lainnya': 5,
+        'Petani': 3,
+        'Peternak': 3,
+        'Pedagang Kecil': 4,
+        'Karyawan Swasta': 5,
+        'Lainnya': 9,
         'Wiraswasta': 6,
         'Wirausaha': 6,
         'Pedagang Besar': 7,
@@ -97,10 +114,10 @@ def preprocessing_data(input_file):
     data = data.fillna(data.mode().iloc[0])
 
     # Pilih kolom yang diambil
-    selected_columns = ['no_test', 'id', 'fakultas', 'pekerjaan_ayah', 'pekerjaan_ibu', 'pendapatan_class',
+    selected_columns = ['id', 'fakultas', 'pekerjaan_ayah', 'pekerjaan_ibu', 'pendapatan_class',
                         'penghasilan_ayah', 'penghasilan_ibu', 'kepemilikan_rumah',
-                        'koreksi_pengeluaran_mhs_iuran_sekolah', 'kendaraan', 'sekolah', 'listrik',
-                        'keberadaan_orangtua', 'pajak', 'ukt_rev']
+                        'koreksi_pengeluaran_mhs_iuran_sekolah', 'kendaraan', 'listrik',
+                        'keberadaan_orangtua', 'pajak', 'ukt']
 
     selected_data = data[selected_columns]
 

@@ -6,16 +6,11 @@ from model import model
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, recall_score, precision_score, f1_score
 from io import BytesIO
-import time
-
-import pandas as pd
-
-start_time = time.time()
 
 
 class prediction:
     def prediction(data, n_estimators, max_depth, test_size):
-        preprocessed_data = preparation.preparation_data(data)
+        preprocessed_data = preparation.prepraration_data(data)
         # Print preview of the preprocessed data
         X = preprocessed_data.drop(columns=['ukt']).values
         y = preprocessed_data['ukt'].values
@@ -34,11 +29,6 @@ class prediction:
         precision_test = precision_score(
             y_test, y_pred_test, average='weighted')
         f1_test = f1_score(y_test, y_pred_test, average='weighted')
-
-        test_data = pd.DataFrame(
-            X_test, columns=preprocessed_data.drop(columns=['ukt']).columns)
-        test_data['ukt'] = y_test
-        test_data['Predicted Class'] = y_pred_test
 
         fig, ax = plt.subplots(figsize=(10, 10))
         im = ax.imshow(confusion_mat_test, cmap='Oranges')
@@ -61,17 +51,7 @@ class prediction:
         fig.savefig(buf, format="png", dpi=80, facecolor='#FFEC9E')
         st.image(buf)
         print(confusion_mat_test)
-        end_time = time.time()
-        st.write("Accuracy on Test Set:",
-                 f"<span style='color: black; font-weight: bold;'>{accuracy_test}</span>", unsafe_allow_html=True)
-        st.write("Precision on Test Set:",
-                 f"<span style='color: black;font-weight: bold;'>{precision_test}</span>", unsafe_allow_html=True)
-        st.write("Recall on Test Set:",
-                 f"<span style='color: black; font-weight: bold;'>{recall_test}</span>", unsafe_allow_html=True)
-        st.write("F1-score on Test Set:",
-                 f"<span style='color: black; font-weight: bold;'>{f1_test}</span>", unsafe_allow_html=True)
-        execution_time = end_time - start_time
-        st.write("Waktu eksekusi:",
-                 f"<span style='color: black; font-weight: bold;'>{execution_time:.2f}</span>", unsafe_allow_html=True)
-        st.write("Data after preprocessing with Predicted Classes:")
-        st.write(test_data)
+        st.write("Accuracy on Test Set:", accuracy_test)
+        st.write("Precision on Test Set:", precision_test)
+        st.write("Recall on Test Set:", recall_test)
+        st.write("F1-score on Test Set:", f1_test)
