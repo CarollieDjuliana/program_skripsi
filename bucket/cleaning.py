@@ -93,13 +93,36 @@ import pandas as pd
 import pandas as pd
 
 # Load dataset from CSV
-data = pd.read_csv('after_preprocessing.csv')
+# data = pd.read_csv('after_preprocessing.csv')
+data = pd.read_csv('data_verifikasi_ukt2023.csv')
+# selected_ids = [1406, 4322, 4098, 4112, 2698, 1637,
+#                 3164, 1125, 3097, 1995, 821, 1766, 3836, 2930, 379]
 
-selected_ids = [1406, 4322, 4098, 4112, 2698, 1637,
-                3164, 1125, 3097, 1995, 821, 1766, 3836, 2930, 379]
+# # Salin data berdasarkan nilai ID
+# bootstrap_data_id = data[data['id'].isin(selected_ids)]
 
-# Salin data berdasarkan nilai ID
-bootstrap_data_id = data[data['id'].isin(selected_ids)]
+# # Simpan data ke dalam file CSV
+# bootstrap_data_id.to_csv('bootstrap_data_id.csv', index=False)
 
-# Simpan data ke dalam file CSV
-bootstrap_data_id.to_csv('bootstrap_data_id.csv', index=False)
+
+# ..................................................................................................................
+
+# # Hitung rata-rata kolom 'penghasilan_ayah'
+# rata_rata_penghasilan_ayah = data['penghasilan_ayah'].mean()
+
+# print(f'Rata-rata penghasilan ayah: Rp{rata_rata_penghasilan_ayah:,.2f}')
+
+# ....................................................................................................................
+selected_data = data[['pekerjaan ayah', 'penghasilan ayah']]
+
+# Hitung nilai terendah dan rata-rata penghasilan untuk setiap pekerjaan
+grouped_data = selected_data.groupby('pekerjaan ayah').agg(
+    min_penghasilan=pd.NamedAgg(column='penghasilan ayah', aggfunc='min'),
+    rata_rata_penghasilan=pd.NamedAgg(
+        column='penghasilan ayah', aggfunc='mean')
+).reset_index()
+
+print(grouped_data)
+
+# Simpan hasil ke file CSV jika diperlukan
+grouped_data.to_csv('hasil_penghasilan_pekerjaan.csv', index=False)

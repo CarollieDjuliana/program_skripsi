@@ -33,7 +33,6 @@ param_dist = {
     'n_estimators': 45,
     'max_depth': 32,
     'random_state': 42,
-    'n_jobs': -1
 }
 rf_model = RandomForestClassifier(**param_dist)
 

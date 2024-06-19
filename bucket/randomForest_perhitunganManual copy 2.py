@@ -96,7 +96,7 @@ class DecisionTree:
         gini_left = calc_gini(left_labels)
         gini_right = calc_gini(right_labels)
         weight_left, weight_right = len(left_labels) / n, len(right_labels) / n
-        gini = (weight_left * gini_left) + (weight_right * gini_right)
+        gini = weight_left * gini_left + weight_right * gini_right
         return gini
 
 

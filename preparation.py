@@ -70,16 +70,15 @@ class preparation:
             'Buruh': 2,
             'Nelayan': 2,
             'Petani': 2,
-            'Peternak': 2,
+            'Pensiunan': 3,
             'Pedagang Kecil': 3,
-            'Karyawan Swasta': 4,
-            'Lainnya': 5,
-            'Wiraswasta': 6,
-            'Wirausaha': 6,
-            'Pedagang Besar': 7,
-            'Pensiunan': 8,
-            'PNS / TNI / Polri': 9,
-
+            'Peternak': 4,
+            'Wiraswasta': 4,
+            'Pedagang Besar': 5,
+            'Lainnya': 6,
+            'Karyawan Swasta': 7,
+            'PNS / TNI / Polri': 8,
+            'Wirausaha': 9,
         }
 
         data['pekerjaan ayah'] = data['pekerjaan ayah'].map(mapping_pekerjaan)

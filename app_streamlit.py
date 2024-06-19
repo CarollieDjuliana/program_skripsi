@@ -50,7 +50,7 @@ class app:
                     input_file, delimiter=',', encoding='latin-1')
                 st.write("Preview data :")
                 data.index += 1
-                st.write(data.head(5), index=False)
+                st.write(data, index=False)
                 if st.button("Process"):
                     prediction.prediction(
                         data, n_estimators, max_depth, test_size)

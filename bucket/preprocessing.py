@@ -101,8 +101,8 @@ def preprocessing_data(input_file):
         'Lainnya': 9,
         'Wiraswasta': 6,
         'Wirausaha': 6,
-        'Pedagang Besar': 7,
-        'Pensiunan': 8,
+        'Pedagang Besar': 8,
+        'Pensiunan': 7,
         'PNS / TNI / Polri': 9,
 
     }
